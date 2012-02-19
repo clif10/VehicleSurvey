@@ -428,6 +428,12 @@ public class Surveyor {
 				
 	}
 	
+	/*
+	 * Function to Get the number of cars in the range of a time interval.
+	 * @param directionMap Map which contains the index and the vehicle data to be analysed
+	 * @param timeSpanInMillisec time in milliseconds which is used to calculate the time spans
+	 * 
+	 */
 	private static int getCountOfcarsInTimeSpans(Map<Integer, VehicleData> directionMap, Long timeSpanInMillisec) {
 		
 		int counter = 0;
