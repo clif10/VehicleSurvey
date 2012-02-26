@@ -2,10 +2,9 @@ package com.myorg.utils;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 import com.myorg.data.Enums.Day;
-import com.myorg.data.Enums.TimeInDay;
+
 
 public class Util {
 
@@ -115,4 +114,21 @@ public class Util {
 		return  sdf.format(referenceCalendar.getTime());
 	}
 	
+	public static void printHeading(String string) {
+		System.out.println("---------------------------------------------------");
+		System.out.println("----------   " + string.toUpperCase()+"  ----------");
+		System.out.println("---------------------------------------------------");
+				
+	}
+	public static void printSubHeading(String string) {
+		
+		System.out.println("*******   " + string.toUpperCase()+"  ******");
+					
+	}
+	
+	public static  void printEndOfSection() {
+		System.out.println("---------------------------------------------------\n");
+				
+	}
+
 }
