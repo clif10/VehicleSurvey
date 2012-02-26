@@ -26,12 +26,34 @@ public class TestSurveyor {
  
 	}
 */
-	@Test
+	/*@Test
 	public void testgetCountOfCarsInTimeSpansofEveryHour(){
 		
 		Surveyor.create();
 		
 		Surveyor.getCountOfCarsInTimeSpansofEveryFifteenMinutesNorthBound(); 
+	}*/
+	
+	@Test
+	public void testgetgetCountOfCarsInTimeSpansofEveryHour(){
+		
+		Surveyor.create();
+		
+		Surveyor.getAverageCountOfCarsInTimeSpansofEveryFifteenMinutesNorthBound();
+		
+		Surveyor.getPeakVolumeTimesNorthBound();
+		
+	}
+	
+	@Test
+	public void testgetgetCountOfCarsInTimeSpansofEveryHourSouthBound(){
+		
+		Surveyor.create();
+		
+		Surveyor.getAverageCountOfCarsInTimeSpansofEveryFifteenMinutesSouthBound();
+		
+		Surveyor.getPeakVolumeTimesSouthBound();
+		
 	}
 	
 }
