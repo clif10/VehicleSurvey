@@ -1,11 +1,8 @@
 package com.myorg.data;
 
-import java.util.Calendar;
-import java.util.Date;
-
-import com.myorg.data.Enums.Day;
-
 public class Constants {
+	
+   public static int NUMBEROFDAYSOFSURVEY = 5;
 	
    public static String[] DAYSOFWEEK = 
    {
