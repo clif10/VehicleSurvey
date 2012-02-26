@@ -1,24 +1,25 @@
 package com.myorg.core;
 
-import java.io.IOException;
+
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.TreeMap;
-
-import javax.swing.text.html.HTMLDocument.HTMLReader.CharacterAction;
-
 import com.myorg.data.Enums.Day;
 import com.myorg.data.Enums.TimeInDay;
 import com.myorg.data.VehicleData;
+import com.myorg.logic.VehicleDataAnalyser;
 import com.myorg.utils.FileRead;
 import com.myorg.utils.Util;
 
+/*
+ * This class will orchestra the reading of the survey data,
+ * accepting user inputs and invoking the clas which can analyse this information
+ * 
+ */
 public class Surveyor {
 
 	
@@ -34,31 +35,48 @@ public class Surveyor {
 	 */	
 	static Map<Integer, VehicleData> southBoundMap = null;
 	
-	
+	/*
+	 * Map to store data of the SouthBound Vehicles in sorted order for the key
+	 * 
+	 */
 	static TreeMap<Integer, VehicleData> southBoundSortedMap = null;
-	
+
+	/*
+	 * Map to store data of the NorthBound Vehicles in sorted order for the key
+	 * 
+	 */
 	static TreeMap<Integer, VehicleData> northBoundSortedMap = null;
 
+	/*
+	 * Map to store the count of the NorthBound Vehicles
+	 */
 	static Map<Integer,Integer> countMapNorthBound = null;
-	
+	/*
+	 * Map to store the count of the SouthBound Vehicles
+	 */
 	static Map<Integer,Integer> countMapSouthBound = null;
 	
+	/*
+	 * List to store the cartimings after being read from a source
+	 */
 	static List<String> carTimings = null;
+	
 	
 	static int northBoundKey = 0;
 	
 	static int southBoundKey = 0;
 
-	static int NUMBEROFDAYSOFSURVEY = 5;
 	/**
-	 * @param args
+	 * @param args accepts the name and path of the file names containing the 
+	 * survey data
 	 */
 	public static void main(String[] args) {
 		
 		init();
 		
-		//fillCarTimingsfromFile(args[0]);
-		fillCarTimings();
+		fillCarTimingsfromFile(args[0]);
+		//call this method if the data has to be populated locally
+		//fillCarTimings();
 		
 		readVehicleTimings();
 		
@@ -67,8 +85,19 @@ public class Surveyor {
 		mainMenu();
 	}
 
+	/*
+	 * Method to invoke the vehicle readings processor and the printing of the main menu on the
+	 *  console
+	 */
 	public static void mainMenu()
 	{
+		VehicleDataAnalyser vehicleDataAnalyser = new VehicleDataAnalyser();
+		vehicleDataAnalyser.setNorthBoundMap(northBoundMap);
+		vehicleDataAnalyser.setSouthBoundMap(southBoundMap);
+		vehicleDataAnalyser.setCountMapNorthBound(countMapNorthBound);
+		vehicleDataAnalyser.setCountMapSouthBound(countMapSouthBound);
+		vehicleDataAnalyser.setSortedMapNorthBound(northBoundSortedMap);
+		vehicleDataAnalyser.setSortedMapSouthBound(southBoundSortedMap);
 		while (true) 
 		{
 			printMainMenu();
@@ -76,25 +105,25 @@ public class Surveyor {
 			switch (choice) {
 			case 0: exit();
 					break;
-			case 1: getCountOfcarsInMorning();
+			case 1: vehicleDataAnalyser.getCountOfcarsInMorning();
 					break;
-			case 2: getCountOfcarsInEvening();
+			case 2: vehicleDataAnalyser.getCountOfcarsInEvening();
 					break;
-			case 3: getCountOfCarsInTimeSpansofEveryHourNorthBound();
+			case 3: vehicleDataAnalyser.getCountOfCarsInTimeSpansofEveryHourNorthBound();
 					break;
-			case 4: getCountOfCarsInTimeSpansofEveryHourSouthBound();
+			case 4: vehicleDataAnalyser.getCountOfCarsInTimeSpansofEveryHourSouthBound();
 					break;
-			case 5: getCountOfCarsInTimeSpansofEveryThirtyMinutesNorthBound();
+			case 5: vehicleDataAnalyser.getCountOfCarsInTimeSpansofEveryThirtyMinutesNorthBound();
 					break;
-			case 6: getCountOfCarsInTimeSpansofEveryThirtyMinutesSouthBound();
+			case 6: vehicleDataAnalyser.getCountOfCarsInTimeSpansofEveryThirtyMinutesSouthBound();
 					break;
-			case 7: getCountOfCarsInTimeSpansofEveryTwentyMinutesNorthBound();
+			case 7: vehicleDataAnalyser.getCountOfCarsInTimeSpansofEveryTwentyMinutesNorthBound();
 					break;
-			case 8: getCountOfCarsInTimeSpansofEveryTwentyMinutesSouthBound();
-					break;					
-			case 9: getCountOfCarsInTimeSpansofEveryFifteenMinutesNorthBound();
+			case 8: vehicleDataAnalyser.getCountOfCarsInTimeSpansofEveryTwentyMinutesSouthBound();
+					break;				
+			case 9: vehicleDataAnalyser.getCountOfCarsInTimeSpansofEveryFifteenMinutesNorthBound();
 					break;
-			case 10:getCountOfCarsInTimeSpansofEveryFifteenMinutesSouthBound();
+			case 10:vehicleDataAnalyser.getCountOfCarsInTimeSpansofEveryFifteenMinutesSouthBound();
 					break;
 			
 			default: System.out.println("Wrong choice");
@@ -103,6 +132,9 @@ public class Surveyor {
 		} 
 	}
 
+	/*
+	 * Method to print the main menu on the console
+	 */
 	private static void printMainMenu() {
 		
 		System.out.println("============================");
@@ -128,23 +160,16 @@ public class Surveyor {
 		System.out.flush();
 		Scanner in = new Scanner(System.in);
 		inNumber=in.nextInt();
-  //       in.close();
-	       System.out.println("Number is :"+inNumber);
-
+        System.out.println("Number is :"+inNumber);
 		return inNumber;
-		
-	//	return Integer.valueOf(inString().trim()).intValue());
-		
+			
 	}
 	
 	private static void exit() {
-		printHeading("THANK YOU");
+		Util.printHeading("THANK YOU");
 		System.exit(1);
-		
-		
-	//	return Integer.valueOf(inString().trim()).intValue());
-		
 	}
+	
 	public static void create()
 	{
 		init();
@@ -152,17 +177,16 @@ public class Surveyor {
 		fillCarTimings();
 		
 		readVehicleTimings();
-		
-		
+			
 	}
 	
 	private static void fillCarTimingsfromFile(String fileName) {
 		carTimings = new ArrayList<String>();
 		
 		carTimings = FileRead.readFile(fileName);
-		
-		
+			
 	}
+	
 	private static void fillCarTimings() {
 		carTimings = new ArrayList<String>();
 		
@@ -178,7 +202,7 @@ public class Surveyor {
 		carTimings.add("A1089948");
 		carTimings.add("B1089951");
 
-}
+	}
 	
 	
 	private static void init() {
@@ -187,7 +211,6 @@ public class Surveyor {
 	}
 
 	private static void readVehicleTimings() {
-		//TODO: replace the for loop by reading from a file
 		String firstReading = null;
 		String secondReading = null;
 		for (int firstIndex=0; firstIndex < 10 ; firstIndex++)
@@ -207,7 +230,7 @@ public class Surveyor {
 		
 		}
 		
-//		System.out.println("Cars in the morning are " + getCountOfcarsInMorning());
+		//System.out.println("Cars in the morning are " + getCountOfcarsInMorning());
 		
 	}
 
@@ -274,400 +297,10 @@ public class Surveyor {
 	}
 
 
-	public static void getCountOfcarsMorningOrEvening()
+	/*public static void getCountOfcarsMorningOrEvening()
 	{
 		getCountOfcarsInMorning();
 		getCountOfcarsInEvening();
-	}
+	}*/
 	
-	
-    public static int getCountOfcarsInMorning() {
-
-    	printHeading(" Number of Cars in the Morning ");
-
-		printSubHeading(" SouthBound and NorthBound ");
-
-		int noInNorthbound = getCountOfcarsInMorningOrEvening(northBoundMap, TimeInDay.AM);
-		int noInSouthbound = getCountOfcarsInMorningOrEvening(southBoundMap, TimeInDay.AM);
-		
-		int totalInMorning = noInSouthbound + noInNorthbound;
-		
-		System.out.println(" Count = " + totalInMorning);
-		return totalInMorning;
-		
-	}
-
-    public static int getCountOfcarsInEvening() {
-    	
-    	printHeading(" Number of Cars in the Evening ");
-
-		printSubHeading(" SouthBound and NorthBound ");
-		
-		int noInNorthbound = getCountOfcarsInMorningOrEvening(northBoundMap, TimeInDay.PM);
-		int noInSouthbound = getCountOfcarsInMorningOrEvening(southBoundMap, TimeInDay.PM);
-		
-		int totalInEvening = noInSouthbound + noInNorthbound;
-		
-		System.out.println(" Count = " + totalInEvening);
-		return totalInEvening;
-		
-	}
-
-	private static int getCountOfcarsInMorningOrEvening(Map<Integer, VehicleData> directionMap, TimeInDay timeInDay) {
-		
-		int counter = 0;
-		
-		Iterator<Map.Entry<Integer, VehicleData>> entries = directionMap.entrySet().iterator();
-		while (entries.hasNext()) 
-		{ 
-			Map.Entry<Integer, VehicleData> entry = entries.next(); 
-/*			System.out.println("Key = " + entry.getKey());
-			Util.printDate(" Date ", entry.getValue().getTimeOfRun());
-*/
-			if(timeInDay == entry.getValue().getTimeInDay())
-				counter+=1;
-		}
-		return counter;
-	}
-
-	public static Long getTimeSpansForMinutesToMillisec(int minutes)
-	{
-		return new Long(minutes*60*1000);
-	}
-	
-	public static void getCountOfCarsInTimeSpansofEveryHourSouthBound()
-	{
-		printHeading(" Hourly Data ");
-
-		printSubHeading(" SouthBound Cars ");
-		getCountOfcarsInTimeSpans(southBoundSortedMap, getTimeSpansForMinutesToMillisec(60),false);
-		
-		printEndOfSection();
-	}
-	
-	public static void getCountOfCarsInTimeSpansofEveryHourNorthBound()
-	{
-		printHeading(" Hourly Data ");
-		
-		printSubHeading(" NorthBound Cars ");
-		getCountOfcarsInTimeSpans(northBoundSortedMap, getTimeSpansForMinutesToMillisec(60),false);
-				
-		printEndOfSection();
-	}
-	
-	public static void getCountOfCarsInTimeSpansofEveryThirtyMinutesSouthBound()
-	{
-		printHeading(" Every Thirty Minutes Data ");
-
-		printSubHeading(" SouthBound Cars ");
-		getCountOfcarsInTimeSpans(southBoundSortedMap, getTimeSpansForMinutesToMillisec(30),false);
-		
-		printEndOfSection();
-	}
-
-	public static void getCountOfCarsInTimeSpansofEveryThirtyMinutesNorthBound()
-	{
-		printHeading(" Every Thirty Minutes Data ");
-
-		printSubHeading(" North Bound Cars ");
-		getCountOfcarsInTimeSpans(northBoundSortedMap, getTimeSpansForMinutesToMillisec(30),false);
-		
-		printEndOfSection();
-	}
-
-	public static void getCountOfCarsInTimeSpansofEveryTwentyMinutesSouthBound()
-	{
-		printHeading(" Every Twenty Minutes Data ");
-
-		printSubHeading(" SouthBound Cars ");
-		getCountOfcarsInTimeSpans(southBoundSortedMap, getTimeSpansForMinutesToMillisec(20),false);
-		
-		printEndOfSection();
-	}
-
-	public static void getCountOfCarsInTimeSpansofEveryTwentyMinutesNorthBound()
-	{
-		printHeading(" Every Twenty Minutes Data ");
-
-		printSubHeading(" North Bound Cars ");
-		getCountOfcarsInTimeSpans(northBoundSortedMap, getTimeSpansForMinutesToMillisec(20),false);
-		
-		printEndOfSection();
-	}
-
-	public static void getCountOfCarsInTimeSpansofEveryFifteenMinutesSouthBound()
-	{
-		printHeading(" Every Fifteen Minutes Data ");
-
-		printSubHeading(" SouthBound Cars ");
-//		getCountOfcarsInTimeSpans(southBoundMap, getTimeSpansForMinutesToMillisec(15));
-		getCountOfcarsInTimeSpans(southBoundSortedMap, getTimeSpansForMinutesToMillisec(15),false);
-		
-		printEndOfSection();
-	}
-
-	public static void getCountOfCarsInTimeSpansofEveryFifteenMinutesNorthBound()
-	{
-		printHeading(" Every Fifteen Minutes Data ");
-
-		printSubHeading(" North Bound Cars ");
-		getCountOfcarsInTimeSpans(northBoundSortedMap, getTimeSpansForMinutesToMillisec(15),false);
-		
-		printEndOfSection();
-	}
-	
-	private static void printHeading(String string) {
-		System.out.println("---------------------------------------------------");
-		System.out.println("----------   " + string.toUpperCase()+"  ----------");
-		System.out.println("---------------------------------------------------");
-				
-	}
-	private static void printSubHeading(String string) {
-		
-		System.out.println("*******   " + string.toUpperCase()+"  ******");
-					
-	}
-	
-	private static void printEndOfSection() {
-		System.out.println("---------------------------------------------------\n");
-				
-	}
-	
-	/*
-	 * Function to Get the number of cars in the range of a time interval.
-	 * @param directionMap Map which contains the index and the vehicle data to be analysed
-	 * @param timeSpanInMillisec time in milliseconds which is used to calculate the time spans
-	 * 
-	 */
-	private static int getCountOfcarsInTimeSpans(Map<Integer, VehicleData> directionMap, Long timeSpanInMillisec,
-												boolean isAverageStorageRequired) {
-		
-		int counter = 0;
-		 
-		Iterator<Map.Entry<Integer, VehicleData>> entries = directionMap.entrySet().iterator();
-		Long incrementalMilliSec = Util.getReferenceDate().getTimeInMillis() + timeSpanInMillisec;
-		Calendar incrementingSecondCalendar = Util.getReferenceDate();
-		incrementingSecondCalendar.setTimeInMillis(incrementalMilliSec);
-		
-		Calendar incrementingFirstCalendar = Util.getReferenceDate();
-		Util.printDate(" First date  ", incrementingFirstCalendar);
-		Util.printDate(" Second date  ", incrementingSecondCalendar);
-		
-			counter = 0;
-			boolean isPrintedInfo = false;
-			while (entries.hasNext()) 
-			{ 
-				Map.Entry<Integer, VehicleData> entry = entries.next(); 
-				System.out.println("Key = " + entry.getKey());
-				Util.printDate(" Date ", entry.getValue().getTimeOfRun());
-				
-				int lowerbBound = entry.getValue().getTimeOfRun().compareTo(incrementingFirstCalendar);
-				int upperBound = entry.getValue().getTimeOfRun().compareTo(incrementingSecondCalendar);
-				
-				if(lowerbBound >= 0 && upperBound < 0)
-				{
-					counter++;
-					if(isAverageStorageRequired)
-							storeHourOfDayVehiclesNorthBound(
-									incrementingFirstCalendar.get(Calendar.HOUR_OF_DAY));
-					isPrintedInfo = false;
-				}
-				else
-				{
-					System.out.println("Number of cars between " + Util.returnDateAsString(incrementingFirstCalendar)
-							+ " and " +Util.returnDateAsString(incrementingSecondCalendar) 
-							+ " = " + counter);
-					
-
-					counter = 0;
-					
-					incrementingFirstCalendar.add(Calendar.MILLISECOND, timeSpanInMillisec.intValue());
-					incrementingSecondCalendar.add(Calendar.MILLISECOND, timeSpanInMillisec.intValue());
-
-					lowerbBound = entry.getValue().getTimeOfRun().compareTo(incrementingFirstCalendar);
-					upperBound = entry.getValue().getTimeOfRun().compareTo(incrementingSecondCalendar);
-					
-					if(lowerbBound >= 0 && upperBound < 0)
-					{
-						counter++;
-						if(isAverageStorageRequired)
-							storeHourOfDayVehiclesNorthBound(
-									incrementingFirstCalendar.get(Calendar.HOUR_OF_DAY));
-
-						isPrintedInfo = false;
-					}
-
-					Util.printDate("Second Increment",incrementingSecondCalendar);
-					Util.printDate("End Date",Util.getEndDate());
-					
-					if (incrementingSecondCalendar.compareTo(Util.getEndDate()) > 0)
-					{
-						isPrintedInfo = true;
-						break;
-					}
-					
-				}
-			}
-				if(!isPrintedInfo)
-				{
-					System.out.println("Number of cars between " + Util.returnDateAsString(incrementingFirstCalendar)
-							+ " and " +Util.returnDateAsString(incrementingSecondCalendar) 
-							+ " = " + counter);
-				}
-					
-		return counter;
-	}
-	
-	public static void storeHourOfDayVehiclesNorthBound(int hourOfDay)
-	{
-		int currentCount;
-				
-		if(countMapNorthBound.containsKey(hourOfDay))
-		{
-		      currentCount = countMapNorthBound.get(hourOfDay);
-		      countMapNorthBound.put(hourOfDay, ++currentCount);		      
-		}
-		else
-			countMapNorthBound.put(hourOfDay, 1);		
-	}
-
-	public static void storeHourOfDayVehiclesSouthBound(int hourOfDay)
-	{
-		int currentCount;
-				
-		if(countMapSouthBound.containsKey(hourOfDay))
-		{
-		      currentCount = countMapSouthBound.get(hourOfDay);
-		      countMapSouthBound.put(hourOfDay, ++currentCount);		      
-		}
-		else
-			countMapSouthBound.put(hourOfDay, 1);		
-	}
-
-	public static void getAverageCountOfCarsInTimeSpansofEveryFifteenMinutesSouthBound()
-	{
-		printHeading(" Average Count of Cars Every Fifteen Minutes Data for 5 days");
-
-		printSubHeading(" South Bound Cars ");
-		
-		countMapSouthBound = new TreeMap<Integer,Integer>();
-		
-		getCountOfcarsInTimeSpans(southBoundMap, getTimeSpansForMinutesToMillisec(15), true);
-		
-		Iterator<Map.Entry<Integer, Integer>> entries = countMapSouthBound.entrySet().iterator();
-		
-		Map.Entry<Integer,Integer> tempMap = null;
-		while(entries.hasNext())
-		{
-			tempMap = entries.next();
-			System.out.println(" Hour " + tempMap.getKey() );
-			System.out.println("Value = " + tempMap.getValue());
-			
-			System.out.println(" The number of car in Hour " + 
-									tempMap.getKey() + " = " +
-									(tempMap.getValue())/NUMBEROFDAYSOFSURVEY); 
-		}	
-		
-		printEndOfSection();
-	}
-	
-	public static void getAverageCountOfCarsInTimeSpansofEveryFifteenMinutesNorthBound()
-	{
-		printHeading(" Average Count of Cars Every Fifteen Minutes Data for 5 days");
-
-		printSubHeading(" North Bound Cars ");
-		
-		countMapNorthBound = new TreeMap<Integer,Integer>();
-		
-		getCountOfcarsInTimeSpans(northBoundMap, getTimeSpansForMinutesToMillisec(15), true);
-		
-		Iterator<Map.Entry<Integer, Integer>> entries = countMapNorthBound.entrySet().iterator();
-		
-		Map.Entry<Integer,Integer> tempMap = null;
-		while(entries.hasNext())
-		{
-			tempMap = entries.next();
-			System.out.println(" Hour " + tempMap.getKey() );
-			System.out.println("Value = " + tempMap.getValue());
-			
-			System.out.println(" The number of car in Hour " + 
-									tempMap.getKey() + " = " +
-									(tempMap.getValue())/NUMBEROFDAYSOFSURVEY); 
-		}	
-		
-		printEndOfSection();
-	}
-	
-	public static void getPeakVolumeTimesNorthBound()
-	{
-		printHeading(" Peak Volume Times Count of Cars Every Fifteen Minutes Data for 5 days");
-
-		printSubHeading(" North Bound Cars ");
-		
-		countMapNorthBound = new TreeMap<Integer,Integer>();
-		
-		getCountOfcarsInTimeSpans(northBoundMap, getTimeSpansForMinutesToMillisec(15), true);
-		
-		Iterator<Map.Entry<Integer, Integer>> entries = countMapNorthBound.entrySet().iterator();
-		
-		Map.Entry<Integer,Integer> tempMap = null;
-		int prevPeakVolume = 0 ;
-		int currentPeakVolume = 0 ;
-		while(entries.hasNext())
-		{
-			tempMap = entries.next();
-			currentPeakVolume  = tempMap.getValue();
-			if (currentPeakVolume >= prevPeakVolume)
-				prevPeakVolume = currentPeakVolume;
-		}
-		
-		Iterator<Map.Entry<Integer, Integer>> entries1 = countMapNorthBound.entrySet().iterator();
-		
-		while(entries1.hasNext())
-		{
-			tempMap = entries1.next();
-			if (prevPeakVolume == tempMap.getValue())
-			System.out.println(" The Hour in the day that have peak volume of cars  " + 
-				prevPeakVolume + " = " + (tempMap.getKey())); 
-		}
-		
-		printEndOfSection();
-	}
-
-	public static void getPeakVolumeTimesSouthBound()
-	{
-		printHeading(" Peak Volume Times Count of Cars Every Fifteen Minutes Data for 5 days");
-
-		printSubHeading(" South Bound Cars ");
-		
-		countMapSouthBound = new TreeMap<Integer,Integer>();
-		
-		getCountOfcarsInTimeSpans(southBoundMap, getTimeSpansForMinutesToMillisec(15), true);
-		
-		Iterator<Map.Entry<Integer, Integer>> entries = countMapSouthBound.entrySet().iterator();
-		
-		Map.Entry<Integer,Integer> tempMap = null;
-		int prevPeakVolume = 0 ;
-		int currentPeakVolume = 0 ;
-		while(entries.hasNext())
-		{
-			tempMap = entries.next();
-			currentPeakVolume  = tempMap.getValue();
-			if (currentPeakVolume >= prevPeakVolume)
-				prevPeakVolume = currentPeakVolume;
-		}
-		
-		Iterator<Map.Entry<Integer, Integer>> entries1 = countMapSouthBound.entrySet().iterator();
-		
-		while(entries1.hasNext())
-		{
-			tempMap = entries1.next();
-			if (prevPeakVolume == tempMap.getValue())
-			System.out.println(" The Hour in the day that have peak volume of cars  " + 
-				prevPeakVolume + " = " + (tempMap.getKey())); 
-		}
-		
-		printEndOfSection();
-	}
-
 }
