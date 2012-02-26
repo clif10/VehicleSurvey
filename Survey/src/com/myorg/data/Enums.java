@@ -1,6 +1,6 @@
 package com.myorg.data;
 
-import com.myorg.data.Enums.TimeInDay;
+
 
 public class Enums {
 
