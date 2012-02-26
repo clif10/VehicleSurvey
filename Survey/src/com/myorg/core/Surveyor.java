@@ -38,13 +38,18 @@ public class Surveyor {
 	static TreeMap<Integer, VehicleData> southBoundSortedMap = null;
 	
 	static TreeMap<Integer, VehicleData> northBoundSortedMap = null;
+
+	static Map<Integer,Integer> countMapNorthBound = null;
+	
+	static Map<Integer,Integer> countMapSouthBound = null;
 	
 	static List<String> carTimings = null;
 	
 	static int northBoundKey = 0;
 	
 	static int southBoundKey = 0;
-	
+
+	static int NUMBEROFDAYSOFSURVEY = 5;
 	/**
 	 * @param args
 	 */
@@ -335,7 +340,7 @@ public class Surveyor {
 		printHeading(" Hourly Data ");
 
 		printSubHeading(" SouthBound Cars ");
-		getCountOfcarsInTimeSpans(southBoundSortedMap, getTimeSpansForMinutesToMillisec(60));
+		getCountOfcarsInTimeSpans(southBoundSortedMap, getTimeSpansForMinutesToMillisec(60),false);
 		
 		printEndOfSection();
 	}
@@ -345,7 +350,7 @@ public class Surveyor {
 		printHeading(" Hourly Data ");
 		
 		printSubHeading(" NorthBound Cars ");
-		getCountOfcarsInTimeSpans(northBoundSortedMap, getTimeSpansForMinutesToMillisec(60));
+		getCountOfcarsInTimeSpans(northBoundSortedMap, getTimeSpansForMinutesToMillisec(60),false);
 				
 		printEndOfSection();
 	}
@@ -355,7 +360,7 @@ public class Surveyor {
 		printHeading(" Every Thirty Minutes Data ");
 
 		printSubHeading(" SouthBound Cars ");
-		getCountOfcarsInTimeSpans(southBoundSortedMap, getTimeSpansForMinutesToMillisec(30));
+		getCountOfcarsInTimeSpans(southBoundSortedMap, getTimeSpansForMinutesToMillisec(30),false);
 		
 		printEndOfSection();
 	}
@@ -365,7 +370,7 @@ public class Surveyor {
 		printHeading(" Every Thirty Minutes Data ");
 
 		printSubHeading(" North Bound Cars ");
-		getCountOfcarsInTimeSpans(northBoundSortedMap, getTimeSpansForMinutesToMillisec(30));
+		getCountOfcarsInTimeSpans(northBoundSortedMap, getTimeSpansForMinutesToMillisec(30),false);
 		
 		printEndOfSection();
 	}
@@ -375,7 +380,7 @@ public class Surveyor {
 		printHeading(" Every Twenty Minutes Data ");
 
 		printSubHeading(" SouthBound Cars ");
-		getCountOfcarsInTimeSpans(southBoundSortedMap, getTimeSpansForMinutesToMillisec(20));
+		getCountOfcarsInTimeSpans(southBoundSortedMap, getTimeSpansForMinutesToMillisec(20),false);
 		
 		printEndOfSection();
 	}
@@ -385,7 +390,7 @@ public class Surveyor {
 		printHeading(" Every Twenty Minutes Data ");
 
 		printSubHeading(" North Bound Cars ");
-		getCountOfcarsInTimeSpans(northBoundSortedMap, getTimeSpansForMinutesToMillisec(20));
+		getCountOfcarsInTimeSpans(northBoundSortedMap, getTimeSpansForMinutesToMillisec(20),false);
 		
 		printEndOfSection();
 	}
@@ -396,7 +401,7 @@ public class Surveyor {
 
 		printSubHeading(" SouthBound Cars ");
 //		getCountOfcarsInTimeSpans(southBoundMap, getTimeSpansForMinutesToMillisec(15));
-		getCountOfcarsInTimeSpans(southBoundSortedMap, getTimeSpansForMinutesToMillisec(15));
+		getCountOfcarsInTimeSpans(southBoundSortedMap, getTimeSpansForMinutesToMillisec(15),false);
 		
 		printEndOfSection();
 	}
@@ -406,7 +411,7 @@ public class Surveyor {
 		printHeading(" Every Fifteen Minutes Data ");
 
 		printSubHeading(" North Bound Cars ");
-		getCountOfcarsInTimeSpans(northBoundSortedMap, getTimeSpansForMinutesToMillisec(15));
+		getCountOfcarsInTimeSpans(northBoundSortedMap, getTimeSpansForMinutesToMillisec(15),false);
 		
 		printEndOfSection();
 	}
@@ -434,7 +439,8 @@ public class Surveyor {
 	 * @param timeSpanInMillisec time in milliseconds which is used to calculate the time spans
 	 * 
 	 */
-	private static int getCountOfcarsInTimeSpans(Map<Integer, VehicleData> directionMap, Long timeSpanInMillisec) {
+	private static int getCountOfcarsInTimeSpans(Map<Integer, VehicleData> directionMap, Long timeSpanInMillisec,
+												boolean isAverageStorageRequired) {
 		
 		int counter = 0;
 		 
@@ -461,6 +467,9 @@ public class Surveyor {
 				if(lowerbBound >= 0 && upperBound < 0)
 				{
 					counter++;
+					if(isAverageStorageRequired)
+							storeHourOfDayVehiclesNorthBound(
+									incrementingFirstCalendar.get(Calendar.HOUR_OF_DAY));
 					isPrintedInfo = false;
 				}
 				else
@@ -481,6 +490,10 @@ public class Surveyor {
 					if(lowerbBound >= 0 && upperBound < 0)
 					{
 						counter++;
+						if(isAverageStorageRequired)
+							storeHourOfDayVehiclesNorthBound(
+									incrementingFirstCalendar.get(Calendar.HOUR_OF_DAY));
+
 						isPrintedInfo = false;
 					}
 
@@ -505,5 +518,156 @@ public class Surveyor {
 		return counter;
 	}
 	
+	public static void storeHourOfDayVehiclesNorthBound(int hourOfDay)
+	{
+		int currentCount;
+				
+		if(countMapNorthBound.containsKey(hourOfDay))
+		{
+		      currentCount = countMapNorthBound.get(hourOfDay);
+		      countMapNorthBound.put(hourOfDay, ++currentCount);		      
+		}
+		else
+			countMapNorthBound.put(hourOfDay, 1);		
+	}
+
+	public static void storeHourOfDayVehiclesSouthBound(int hourOfDay)
+	{
+		int currentCount;
+				
+		if(countMapSouthBound.containsKey(hourOfDay))
+		{
+		      currentCount = countMapSouthBound.get(hourOfDay);
+		      countMapSouthBound.put(hourOfDay, ++currentCount);		      
+		}
+		else
+			countMapSouthBound.put(hourOfDay, 1);		
+	}
+
+	public static void getAverageCountOfCarsInTimeSpansofEveryFifteenMinutesSouthBound()
+	{
+		printHeading(" Average Count of Cars Every Fifteen Minutes Data for 5 days");
+
+		printSubHeading(" South Bound Cars ");
+		
+		countMapSouthBound = new TreeMap<Integer,Integer>();
+		
+		getCountOfcarsInTimeSpans(southBoundMap, getTimeSpansForMinutesToMillisec(15), true);
+		
+		Iterator<Map.Entry<Integer, Integer>> entries = countMapSouthBound.entrySet().iterator();
+		
+		Map.Entry<Integer,Integer> tempMap = null;
+		while(entries.hasNext())
+		{
+			tempMap = entries.next();
+			System.out.println(" Hour " + tempMap.getKey() );
+			System.out.println("Value = " + tempMap.getValue());
+			
+			System.out.println(" The number of car in Hour " + 
+									tempMap.getKey() + " = " +
+									(tempMap.getValue())/NUMBEROFDAYSOFSURVEY); 
+		}	
+		
+		printEndOfSection();
+	}
 	
+	public static void getAverageCountOfCarsInTimeSpansofEveryFifteenMinutesNorthBound()
+	{
+		printHeading(" Average Count of Cars Every Fifteen Minutes Data for 5 days");
+
+		printSubHeading(" North Bound Cars ");
+		
+		countMapNorthBound = new TreeMap<Integer,Integer>();
+		
+		getCountOfcarsInTimeSpans(northBoundMap, getTimeSpansForMinutesToMillisec(15), true);
+		
+		Iterator<Map.Entry<Integer, Integer>> entries = countMapNorthBound.entrySet().iterator();
+		
+		Map.Entry<Integer,Integer> tempMap = null;
+		while(entries.hasNext())
+		{
+			tempMap = entries.next();
+			System.out.println(" Hour " + tempMap.getKey() );
+			System.out.println("Value = " + tempMap.getValue());
+			
+			System.out.println(" The number of car in Hour " + 
+									tempMap.getKey() + " = " +
+									(tempMap.getValue())/NUMBEROFDAYSOFSURVEY); 
+		}	
+		
+		printEndOfSection();
+	}
+	
+	public static void getPeakVolumeTimesNorthBound()
+	{
+		printHeading(" Peak Volume Times Count of Cars Every Fifteen Minutes Data for 5 days");
+
+		printSubHeading(" North Bound Cars ");
+		
+		countMapNorthBound = new TreeMap<Integer,Integer>();
+		
+		getCountOfcarsInTimeSpans(northBoundMap, getTimeSpansForMinutesToMillisec(15), true);
+		
+		Iterator<Map.Entry<Integer, Integer>> entries = countMapNorthBound.entrySet().iterator();
+		
+		Map.Entry<Integer,Integer> tempMap = null;
+		int prevPeakVolume = 0 ;
+		int currentPeakVolume = 0 ;
+		while(entries.hasNext())
+		{
+			tempMap = entries.next();
+			currentPeakVolume  = tempMap.getValue();
+			if (currentPeakVolume >= prevPeakVolume)
+				prevPeakVolume = currentPeakVolume;
+		}
+		
+		Iterator<Map.Entry<Integer, Integer>> entries1 = countMapNorthBound.entrySet().iterator();
+		
+		while(entries1.hasNext())
+		{
+			tempMap = entries1.next();
+			if (prevPeakVolume == tempMap.getValue())
+			System.out.println(" The Hour in the day that have peak volume of cars  " + 
+				prevPeakVolume + " = " + (tempMap.getKey())); 
+		}
+		
+		printEndOfSection();
+	}
+
+	public static void getPeakVolumeTimesSouthBound()
+	{
+		printHeading(" Peak Volume Times Count of Cars Every Fifteen Minutes Data for 5 days");
+
+		printSubHeading(" South Bound Cars ");
+		
+		countMapSouthBound = new TreeMap<Integer,Integer>();
+		
+		getCountOfcarsInTimeSpans(southBoundMap, getTimeSpansForMinutesToMillisec(15), true);
+		
+		Iterator<Map.Entry<Integer, Integer>> entries = countMapSouthBound.entrySet().iterator();
+		
+		Map.Entry<Integer,Integer> tempMap = null;
+		int prevPeakVolume = 0 ;
+		int currentPeakVolume = 0 ;
+		while(entries.hasNext())
+		{
+			tempMap = entries.next();
+			currentPeakVolume  = tempMap.getValue();
+			if (currentPeakVolume >= prevPeakVolume)
+				prevPeakVolume = currentPeakVolume;
+		}
+		
+		Iterator<Map.Entry<Integer, Integer>> entries1 = countMapSouthBound.entrySet().iterator();
+		
+		while(entries1.hasNext())
+		{
+			tempMap = entries1.next();
+			if (prevPeakVolume == tempMap.getValue())
+			System.out.println(" The Hour in the day that have peak volume of cars  " + 
+				prevPeakVolume + " = " + (tempMap.getKey())); 
+		}
+		
+		printEndOfSection();
+	}
+
 }
