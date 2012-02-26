@@ -4,56 +4,72 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import com.myorg.logic.VehicleDataAnalyser;
+
 public class TestSurveyor {
 	
-	 
+	VehicleDataAnalyser vehicleDataAnalyser = null;
+	
 	/*@Test
 	public void testCountForNorthBound() {
  
-		Surveyor surveyor = new Surveyor();
-		surveyor.create();
-		Assert.assertEquals(surveyor.getCountForNorthBound() , 2);
+		this.setup();
+		
+		Assert.assertEquals(vehicleDataAnalyser.getCountForNorthBound() , 2);
  
 	}
 */
 /*	@Test
 	public void testgetCountOfcarsInMorning() {
- 
-		Surveyor surveyor = new Surveyor();
-		surveyor.create();
+ 		this.setup();
 		
-		Assert.assertEquals(surveyor.getCountOfcarsInMorning(), 3);
+		Assert.assertEquals(vehicleDataAnalyser.getCountOfcarsInMorning(), 3);
  
 	}
 */
 	/*@Test
 	public void testgetCountOfCarsInTimeSpansofEveryHour(){
 		
-		Surveyor.create();
+		this.setUp();
 		
-		Surveyor.getCountOfCarsInTimeSpansofEveryFifteenMinutesNorthBound(); 
+		vehicleDataAnalyser.getCountOfCarsInTimeSpansofEveryFifteenMinutesNorthBound(); 
 	}*/
 	
 	@Test
 	public void testgetgetCountOfCarsInTimeSpansofEveryHour(){
 		
-		Surveyor.create();
+		this.setUp();
 		
-		Surveyor.getAverageCountOfCarsInTimeSpansofEveryFifteenMinutesNorthBound();
+		vehicleDataAnalyser.getAverageCountOfCarsInTimeSpansofEveryFifteenMinutesNorthBound();
 		
-		Surveyor.getPeakVolumeTimesNorthBound();
+		vehicleDataAnalyser.getPeakVolumeTimesNorthBound();
 		
 	}
 	
 	@Test
 	public void testgetgetCountOfCarsInTimeSpansofEveryHourSouthBound(){
 		
-		Surveyor.create();
+		this.setUp();
 		
-		Surveyor.getAverageCountOfCarsInTimeSpansofEveryFifteenMinutesSouthBound();
+		vehicleDataAnalyser.getAverageCountOfCarsInTimeSpansofEveryFifteenMinutesSouthBound();
 		
-		Surveyor.getPeakVolumeTimesSouthBound();
+		vehicleDataAnalyser.getPeakVolumeTimesSouthBound();
 		
+	}
+	
+	private void setUp()
+	{
+	
+	Surveyor.create();
+	
+	vehicleDataAnalyser = new VehicleDataAnalyser();
+	vehicleDataAnalyser.setNorthBoundMap(Surveyor.northBoundMap);
+	vehicleDataAnalyser.setSouthBoundMap(Surveyor.southBoundMap);
+	vehicleDataAnalyser.setCountMapNorthBound(Surveyor.countMapNorthBound);
+	vehicleDataAnalyser.setCountMapSouthBound(Surveyor.countMapSouthBound);
+	vehicleDataAnalyser.setSortedMapNorthBound(Surveyor.northBoundSortedMap);
+	vehicleDataAnalyser.setSortedMapSouthBound(Surveyor.southBoundSortedMap);
+	
 	}
 	
 }
